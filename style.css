@@ -46,6 +46,14 @@ body {
   max-height: 100dvh;
 }
 
+h2{
+  font-family: "Orbitron", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  text-transform: capitalize;
+}
+
 #pokemon-details {
   display: flex;
   min-height: 50dvh;
@@ -85,5 +93,13 @@ body {
 
 .pokemon-card:hover {
   transform: translateY(-5px) scale(1.01)
+}
+
+#pokemon-details-placeholder{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 2px solid black;
 }
 

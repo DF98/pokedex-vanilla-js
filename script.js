@@ -1,7 +1,25 @@
 const pokemonContainer = document.querySelector('#pokemon-container');
 const pokemonDetails = document.querySelector('#pokemon-details');
-const generatePkmnPreviewHTML = () =>{
+const generatePkmnPreviewHTML = () => {
 
+}
+
+const generatePokemonPreview = (id, name, sprite, types) => {
+    const previewContainer = document.createElement('div');
+    const title = document.createElement('h2');
+    const img = document.createElement('img');
+    const typesList = document.createElement('p');
+
+    previewContainer.id = "pokemon-preview";
+    title.innerText = `#${id} ${name}`
+    img.src = `${sprite}`
+    typesList.innerText = `Types: ${types.map(type => type.type.name).join(" ")}`
+
+    previewContainer.append(title);
+    previewContainer.append(img);
+    previewContainer.append(typesList);
+
+    return previewContainer;
 }
 
 const fetchGenIPokemon = async () => {
@@ -26,13 +44,40 @@ const fetchGenIPokemon = async () => {
 
         pokemonCards.forEach(card => card.addEventListener('click', () => {
             const pokemonData = data[card.dataset.id - 1];
+
+            const pokemon = {
+                id: pokemonData.id,
+                name: pokemonData.name,
+                sprite: pokemonData.sprites.other['official-artwork']['front_default'],
+                types: pokemonData.types
+            }
+
+            const pokemonPreviewHTML = generatePokemonPreview(
+                pokemon.id,
+                pokemon.name,
+                pokemon.sprite,
+                pokemon.types
+            )
+
             console.log(pokemonData)
-            pokemonDetails.innerHTML = `
-            <div id="pokemon-preview">
-                <h2>#${pokemonData.id}${pokemonData.name}</h2>
-                <img src="${pokemonData.sprites.other['official-artwork']['front_default']}"/>
-            </div>
-            `
+            const placeholder = document.querySelector("#pokemon-details-placeholder");
+            const oldPokemonPreview = document.querySelector("#pokemon-preview")
+            if (placeholder) {
+                pokemonDetails.removeChild(placeholder)
+            }
+            if(oldPokemonPreview){
+                pokemonDetails.replaceChild(pokemonPreviewHTML,oldPokemonPreview)
+            }
+            pokemonDetails.appendChild(pokemonPreviewHTML)
+
+
+            // pokemonDetails.innerHTML = `
+            // <div id="pokemon-preview">
+            //     <h2>#${pokemonData.id} ${pokemonData.name}</h2>
+            //     <img src="${pokemonData.sprites.other['official-artwork']['front_default']}"/>
+            //     <p>Types: ${pokemonData.types.map(type => type.type.name).join(" ")} </p>
+            // </div>
+            // `
         }))
     }
     catch (error) {
