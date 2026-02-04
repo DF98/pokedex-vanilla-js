@@ -42,20 +42,34 @@ textarea {
 
 body {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
+  max-height: 100dvh;
 }
 
-#pokemon-preview {
-  height: 50dvh;
+#pokemon-details {
+  display: flex;
+  min-height: 50dvh;
+  background-color: orange;
+}
+
+#pokemon-preview{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  max-height: 100%;
+  background-color: red;
 }
 
 #pokemon-container {
+  background-color: green;
   padding: 2em;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  max-height: 50dvh;
+  min-height: 50dvh;
   overflow-y: scroll;
 }
 
@@ -66,9 +80,10 @@ body {
   background-color: grey;
   width: 20%;
   border-radius: 1rem;
-  transition: 2ms ease-in-out;
+  transition: .3s ease;
 }
 
 .pokemon-card:hover {
-  transform: translateY(-2px)
+  transform: translateY(-5px) scale(1.01)
 }
+

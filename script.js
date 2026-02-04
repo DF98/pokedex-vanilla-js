@@ -1,4 +1,8 @@
-pokemonContainer = document.querySelector('#pokemon-container');
+const pokemonContainer = document.querySelector('#pokemon-container');
+const pokemonDetails = document.querySelector('#pokemon-details');
+const generatePkmnPreviewHTML = () =>{
+
+}
 
 const fetchGenIPokemon = async () => {
     try {
@@ -11,12 +15,25 @@ const fetchGenIPokemon = async () => {
         console.log(data)
         pokemonContainer.innerHTML = data.map(pokemon => {
             return `
-            <div class="pokemon-card">
+            <div data-id="${pokemon.id}"class="pokemon-card">
                 <h2>${pokemon.name}</h2>
                 <img src="${pokemon.sprites.other['official-artwork']['front_default']}"/>
             </div>
             `
         }).join("")
+
+        const pokemonCards = document.querySelectorAll('.pokemon-card')
+
+        pokemonCards.forEach(card => card.addEventListener('click', () => {
+            const pokemonData = data[card.dataset.id - 1];
+            console.log(pokemonData)
+            pokemonDetails.innerHTML = `
+            <div id="pokemon-preview">
+                <h2>#${pokemonData.id}${pokemonData.name}</h2>
+                <img src="${pokemonData.sprites.other['official-artwork']['front_default']}"/>
+            </div>
+            `
+        }))
     }
     catch (error) {
         console.log(error)
