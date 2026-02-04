@@ -22,6 +22,20 @@ const generatePokemonPreview = (id, name, sprite, types) => {
     return previewContainer;
 }
 
+const generatePokemonInfo = (moves) => {
+    const pokemonInfoContainer = document.createElement('div');
+    const movesList = document.createElement('ul');
+    pokemonInfoContainer.id = "pokemon-info";
+    moves.forEach(move => {
+        const moveLiItem = document.createElement('li');
+        moveLiItem.innerText = move.move.name
+        movesList.appendChild(moveLiItem);
+    })
+
+    pokemonInfoContainer.appendChild(movesList);
+    return pokemonInfoContainer;
+}
+
 const fetchGenIPokemon = async () => {
     try {
         const promises = [];
@@ -30,7 +44,6 @@ const fetchGenIPokemon = async () => {
         }
         const responses = await Promise.all(promises);
         const data = await Promise.all(responses.map(response => response.json()));
-        console.log(data)
         pokemonContainer.innerHTML = data.map(pokemon => {
             return `
             <div data-id="${pokemon.id}"class="pokemon-card">
@@ -49,7 +62,8 @@ const fetchGenIPokemon = async () => {
                 id: pokemonData.id,
                 name: pokemonData.name,
                 sprite: pokemonData.sprites.other['official-artwork']['front_default'],
-                types: pokemonData.types
+                types: pokemonData.types,
+                moves: pokemonData.moves
             }
 
             const pokemonPreviewHTML = generatePokemonPreview(
@@ -59,25 +73,25 @@ const fetchGenIPokemon = async () => {
                 pokemon.types
             )
 
+            const pokemonInfoHTML = generatePokemonInfo(pokemon.moves)
+
             console.log(pokemonData)
             const placeholder = document.querySelector("#pokemon-details-placeholder");
             const oldPokemonPreview = document.querySelector("#pokemon-preview")
+            const oldPokemonInfo = document.querySelector("#pokemon-info")
             if (placeholder) {
                 pokemonDetails.removeChild(placeholder)
             }
-            if(oldPokemonPreview){
-                pokemonDetails.replaceChild(pokemonPreviewHTML,oldPokemonPreview)
+            if (oldPokemonPreview) {
+                pokemonDetails.replaceChild(pokemonPreviewHTML, oldPokemonPreview)
             }
             pokemonDetails.appendChild(pokemonPreviewHTML)
 
+            if (oldPokemonInfo) {
+                pokemonDetails.replaceChild(pokemonInfoHTML, oldPokemonInfo)
+            }
+            pokemonDetails.appendChild(pokemonInfoHTML)
 
-            // pokemonDetails.innerHTML = `
-            // <div id="pokemon-preview">
-            //     <h2>#${pokemonData.id} ${pokemonData.name}</h2>
-            //     <img src="${pokemonData.sprites.other['official-artwork']['front_default']}"/>
-            //     <p>Types: ${pokemonData.types.map(type => type.type.name).join(" ")} </p>
-            // </div>
-            // `
         }))
     }
     catch (error) {
