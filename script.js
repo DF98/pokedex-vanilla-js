@@ -1,12 +1,34 @@
 // Current number of pokemon generations that exist. Value can be updated when new generation is released.
 const POKEMON_GEN_COUNT = 9;
 
-
 const pokemonContainer = document.querySelector('#pokemon-container');
 const pokemonDetails = document.querySelector('#pokemon-details');
 const genBtns = document.querySelectorAll('.gen-btn');
 
+// UTILITY FUNCTIONS
 
+const fetchPokeAPI = async (endpoint, id) => {
+    return fetch(`https://pokeapi.co/api/v2/${endpoint}/${id}/`)
+}
+
+/*
+##function updateParent 
+    #params
+        - parentElement: The parent element that you want to update.
+        - oldChildElementId: The ID of the child element you want to check if it already exists in the parent element
+    #outcome
+        -if child element is already present in the parent replace it with the new element. 
+        -else just append the new child element to the parent element.
+*/
+const updateParentElement = (parentElement, newChildElement, oldChildElementId) => {
+    if (parentElement.contains(document.getElementById(`${oldChildElementId}`))) {
+        pokemonDetails.replaceChild(newChildElement, document.getElementById(`${oldChildElementId}`))
+    } else {
+        pokemonDetails.appendChild(newChildElement);
+    }
+}
+
+// HTML GENERATION FUNCTIONS
 
 const generatePokemonPreview = (id, name, sprite, types) => {
     const previewContainer = document.createElement('div');
@@ -23,7 +45,9 @@ const generatePokemonPreview = (id, name, sprite, types) => {
     previewContainer.append(img);
     previewContainer.append(typesList);
 
-    return previewContainer;
+    // pokemonDetails.appendChild(previewContainer);
+
+    updateParentElement(pokemonDetails,previewContainer,"pokemon-preview")
 }
 
 const generatePokemonInfo = (moves) => {
@@ -37,128 +61,33 @@ const generatePokemonInfo = (moves) => {
     })
 
     pokemonInfoContainer.appendChild(movesList);
-    return pokemonInfoContainer;
+
+    updateParentElement(pokemonDetails,pokemonInfoContainer,"pokemon-info")
+
 }
 
-const fetchGenIPokemon = async () => {
-    try {
-        const promises = [];
-        for (let i = 1; i <= 151; i++) {
-            promises.push(fetch(`https://pokeapi.co/api/v2/pokemon/${i}/`))
+const generatePokemonCard = (id, name, sprite, types, moves) => {
+    const divElement = document.createElement('div');
+    const titleElement = document.createElement('h2');
+    const imgElement = document.createElement('img');
+
+    divElement.dataset.id = id;
+    divElement.classList.add("pokemon-card");
+    titleElement.innerText = name;
+    imgElement.src = sprite;
+
+    divElement.appendChild(titleElement);
+    divElement.appendChild(imgElement);
+    divElement.addEventListener('click', () => {
+        if(!!document.getElementById('pokemon-details-placeholder')){
+            pokemonDetails.removeChild(document.getElementById('pokemon-details-placeholder'))
         }
-        const responses = await Promise.all(promises);
-        const data = await Promise.all(responses.map(response => response.json()));
-        pokemonContainer.innerHTML = data.map(pokemon => {
-            return `
-            <div data-id="${pokemon.id}"class="pokemon-card">
-                <h2>${pokemon.name}</h2>
-                <img src="${pokemon.sprites.other['official-artwork']['front_default']}"/>
-            </div>
-            `
-        }).join("")
+        generatePokemonPreview(id, name, sprite, types)
+        generatePokemonInfo(moves)
+    })
 
-        const pokemonCards = document.querySelectorAll('.pokemon-card')
-
-        pokemonCards.forEach(card => card.addEventListener('click', () => {
-            const pokemonData = data[card.dataset.id - 1];
-
-            const pokemon = {
-                id: pokemonData.id,
-                name: pokemonData.name,
-                sprite: pokemonData.sprites.other['official-artwork']['front_default'],
-                types: pokemonData.types,
-                moves: pokemonData.moves
-            }
-
-            const pokemonPreviewHTML = generatePokemonPreview(
-                pokemon.id,
-                pokemon.name,
-                pokemon.sprite,
-                pokemon.types
-            )
-
-            const pokemonInfoHTML = generatePokemonInfo(pokemon.moves)
-
-            console.log(pokemonData)
-            const placeholder = document.querySelector("#pokemon-details-placeholder");
-            const oldPokemonPreview = document.querySelector("#pokemon-preview")
-            const oldPokemonInfo = document.querySelector("#pokemon-info")
-            if (placeholder) {
-                pokemonDetails.removeChild(placeholder)
-            }
-            if (oldPokemonPreview) {
-                pokemonDetails.replaceChild(pokemonPreviewHTML, oldPokemonPreview)
-            }
-            pokemonDetails.appendChild(pokemonPreviewHTML)
-
-            if (oldPokemonInfo) {
-                pokemonDetails.replaceChild(pokemonInfoHTML, oldPokemonInfo)
-            }
-            pokemonDetails.appendChild(pokemonInfoHTML)
-
-        }))
-    }
-    catch (error) {
-        console.log(error)
-    }
+    return divElement;
 }
-
-
-// NEW FUNCTIONS
-
-// const fetchPokeAPI = async (endpoint, id) => {
-//     try {
-//         const url = `https://pokeapi.co/api/v2/${endpoint}/${id}/`;
-//         const response = await fetch(url);
-//         if (!response.ok) {
-//             console.log("something went wrong")
-//         }
-//         result = await response.json();
-//         return result
-
-//     } catch (error) {
-//         console.error(error)
-//     }
-// }
-
-const fetchPokeAPI = async (endpoint, id) => {
-    return fetch(`https://pokeapi.co/api/v2/${endpoint}/${id}/`)
-}
-
-const getGenLength = async (id) => {
-    if (id <= 0 || id > POKEMON_GEN_COUNT) {
-        console.error('Generation does not exist please enter value between 1 and 9')
-    }
-    const response = await fetchPokeAPI("generation", id);
-    const gen = await response.json()
-    return gen['pokemon_species'].length
-}
-
-const fetchPokemonGen = async () => {
-    const promises = [];
-    for (let i = 1; i <= 151; i++) {
-        promises.push(await fetchPokeAPI("pokemon", i))
-    }
-    const responses = await Promise.all(promises);
-    const result = await Promise.all(responses.map(response => response.json()));
-    return result;
-}
-
-// const pokemonGenerations = async () => {
-//     const genLengthPromises = [];
-
-//     for (let i = 1; i <= POKEMON_GEN_COUNT; i++) {
-//         genLengthPromises.push(getGenLength(i));
-//     }
-
-//     const genLengthArray = await Promise.all(genLengthPromises);
-//     const genArray = genLengthArray.map((genLength, index) => `"gen${index + 1}":${genLength}`)
-//     // casting array to a string, manipulating the string then casting string to object
-//     let genJSON = genArray.toString()
-//     genJSON = genJSON.padEnd(genJSON.length + 1, "}").padStart(genJSON.length + 2, '{');
-
-//     return JSON.parse(genJSON);
-// }
 
 const fetchPokemonFromGen = async (id = 1) => {
     const response = await fetchPokeAPI("generation", id);
@@ -175,39 +104,30 @@ const fetchPokemonFromGen = async (id = 1) => {
     return Promise.all(responseArray.map(response => response.json()))
 }
 
-const createPokemonList = async (gen = 1) => {
-    return getGenLength(gen);
-}
-
 const createPokemonGenList = async (gen = 1) => {
+
     const pokemon = await fetchPokemonFromGen(gen);
+    const pokemonCardsContainer = document.createElement('div');
+    pokemonCardsContainer.id = "cards-container";
 
     pokemon.map(pokemon => {
         const id = pokemon.id;
         const name = pokemon.name;
-        const sprite = pokemon.sprites.other['official-artwork']['front_default']
-
-        pokemonContainer.appendChild(generatePokemonCard(id,name,sprite));
+        const sprite = pokemon.sprites.other['official-artwork']['front_default'];
+        const types = pokemon.types
+        const moves = pokemon.moves
+        pokemonCardsContainer.appendChild(generatePokemonCard(id, name, sprite, types, moves));
     })
-}
 
-const generatePokemonCard = (id, name, sprite) => {
-    const divElement = document.createElement('div');
-    const titleElement = document.createElement('h2');
-    const imgElement = document.createElement('img');
+    if (pokemonContainer.contains(document.getElementById("cards-container"))) {
+        pokemonContainer.replaceChild(pokemonCardsContainer, document.getElementById("cards-container"))
+    }
+    else {
+        pokemonContainer.appendChild(pokemonCardsContainer);
+    }
 
-    divElement.dataset.id = id;
-    divElement.classList.add("pokemon-card");
-    titleElement.innerText = name;
-    imgElement.src = sprite;
-
-    divElement.appendChild(titleElement);
-    divElement.appendChild(imgElement);
-    return divElement;
 }
 
 genBtns.forEach(btn => btn.addEventListener('click', async () => await createPokemonGenList(btn.dataset.id)))
 
-// fetchGenIPokemon();
-
-
+createPokemonGenList(1);
