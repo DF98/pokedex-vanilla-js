@@ -1,6 +1,12 @@
+// Current number of pokemon generations that exist. Value can be updated when new generation is released.
+const POKEMON_GEN_COUNT = 9;
+
+
 const pokemonContainer = document.querySelector('#pokemon-container');
 const pokemonDetails = document.querySelector('#pokemon-details');
 const generatePkmnPreviewHTML = () => {
+
+
 
 }
 
@@ -99,4 +105,69 @@ const fetchGenIPokemon = async () => {
     }
 }
 
-fetchGenIPokemon();
+
+// NEW FUNCTIONS
+
+// const fetchPokeAPI = async (endpoint, id) => {
+//     try {
+//         const url = `https://pokeapi.co/api/v2/${endpoint}/${id}/`;
+//         const response = await fetch(url);
+//         if (!response.ok) {
+//             console.log("something went wrong")
+//         }
+//         result = await response.json();
+//         return result
+
+//     } catch (error) {
+//         console.error(error)
+//     }
+// }
+
+const fetchPokeAPI = async (endpoint, id) => {
+    return fetch(`https://pokeapi.co/api/v2/${endpoint}/${id}/`)
+}
+
+const getGenLength = async (id) => {
+    if (id <= 0 || id > POKEMON_GEN_COUNT) {
+        console.error('Generation does not exist please enter value between 1 and 9')
+    }
+    const response = await fetchPokeAPI("generation", id);
+    const gen = await response.json()
+    return gen['pokemon_species'].length
+}
+
+const fetchPokemonGen = async () => {
+    const promises = [];
+    for (let i = 1; i <= 151; i++) {
+        promises.push(await fetchPokeAPI("pokemon", i))
+    }
+    const responses = await Promise.all(promises);
+    const result = await Promise.all(responses.map(response => response.json()));
+    return result;
+}
+
+const pokemonGenerations = async () => {
+    const genLengthPromises = [];
+
+    for (let i = 1; i <= POKEMON_GEN_COUNT; i++) {
+        genLengthPromises.push(getGenLength(i));
+    }
+
+    const genLengthArray = await Promise.all(genLengthPromises);
+    const genArray = genLengthArray.map((genLength, index) => `"gen${index + 1}":${genLength}`)
+    // casting array to a string, manipulating the string then casting string to object
+    let genJSON = genArray.toString()
+    genJSON = genJSON.padEnd(genJSON.length + 1, "}").padStart(genJSON.length + 2, '{');
+
+    return JSON.parse(genJSON);
+}
+
+const createPokemonList = async (gen = 1) => {
+    return getGenLength(gen);
+}
+
+pokemonGenerations().then(result => console.log(result))
+
+// fetchGenIPokemon();
+
+
