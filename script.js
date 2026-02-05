@@ -4,11 +4,9 @@ const POKEMON_GEN_COUNT = 9;
 
 const pokemonContainer = document.querySelector('#pokemon-container');
 const pokemonDetails = document.querySelector('#pokemon-details');
-const generatePkmnPreviewHTML = () => {
+const genBtns = document.querySelectorAll('.gen-btn');
 
 
-
-}
 
 const generatePokemonPreview = (id, name, sprite, types) => {
     const previewContainer = document.createElement('div');
@@ -146,27 +144,69 @@ const fetchPokemonGen = async () => {
     return result;
 }
 
-const pokemonGenerations = async () => {
-    const genLengthPromises = [];
+// const pokemonGenerations = async () => {
+//     const genLengthPromises = [];
 
-    for (let i = 1; i <= POKEMON_GEN_COUNT; i++) {
-        genLengthPromises.push(getGenLength(i));
-    }
+//     for (let i = 1; i <= POKEMON_GEN_COUNT; i++) {
+//         genLengthPromises.push(getGenLength(i));
+//     }
 
-    const genLengthArray = await Promise.all(genLengthPromises);
-    const genArray = genLengthArray.map((genLength, index) => `"gen${index + 1}":${genLength}`)
-    // casting array to a string, manipulating the string then casting string to object
-    let genJSON = genArray.toString()
-    genJSON = genJSON.padEnd(genJSON.length + 1, "}").padStart(genJSON.length + 2, '{');
+//     const genLengthArray = await Promise.all(genLengthPromises);
+//     const genArray = genLengthArray.map((genLength, index) => `"gen${index + 1}":${genLength}`)
+//     // casting array to a string, manipulating the string then casting string to object
+//     let genJSON = genArray.toString()
+//     genJSON = genJSON.padEnd(genJSON.length + 1, "}").padStart(genJSON.length + 2, '{');
 
-    return JSON.parse(genJSON);
+//     return JSON.parse(genJSON);
+// }
+
+const fetchPokemonFromGen = async (id = 1) => {
+    const response = await fetchPokeAPI("generation", id);
+    const data = await response.json();
+    const pokemonSpecies = data['pokemon_species'];
+
+    const pokemonPromises = pokemonSpecies.map(pokemon => {
+        //Extract the pokemon's ID from the pokemon species url
+        const pokemonId = pokemon.url.replace("v2", "").match(/[0-9]/g).join("");
+        return fetchPokeAPI("pokemon", pokemonId);
+    })
+
+    const responseArray = await Promise.all(pokemonPromises);
+    return Promise.all(responseArray.map(response => response.json()))
 }
 
 const createPokemonList = async (gen = 1) => {
     return getGenLength(gen);
 }
 
-pokemonGenerations().then(result => console.log(result))
+const createPokemonGenList = async (gen = 1) => {
+    const pokemon = await fetchPokemonFromGen(gen);
+
+    pokemon.map(pokemon => {
+        const id = pokemon.id;
+        const name = pokemon.name;
+        const sprite = pokemon.sprites.other['official-artwork']['front_default']
+
+        pokemonContainer.appendChild(generatePokemonCard(id,name,sprite));
+    })
+}
+
+const generatePokemonCard = (id, name, sprite) => {
+    const divElement = document.createElement('div');
+    const titleElement = document.createElement('h2');
+    const imgElement = document.createElement('img');
+
+    divElement.dataset.id = id;
+    divElement.classList.add("pokemon-card");
+    titleElement.innerText = name;
+    imgElement.src = sprite;
+
+    divElement.appendChild(titleElement);
+    divElement.appendChild(imgElement);
+    return divElement;
+}
+
+genBtns.forEach(btn => btn.addEventListener('click', async () => await createPokemonGenList(btn.dataset.id)))
 
 // fetchGenIPokemon();
 
