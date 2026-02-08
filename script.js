@@ -22,9 +22,9 @@ const fetchPokeAPI = async (endpoint, id) => {
 */
 const updateParentElement = (parentElement, newChildElement, oldChildElementId) => {
     if (parentElement.contains(document.getElementById(`${oldChildElementId}`))) {
-        pokemonDetails.replaceChild(newChildElement, document.getElementById(`${oldChildElementId}`))
+        parentElement.replaceChild(newChildElement, document.getElementById(`${oldChildElementId}`))
     } else {
-        pokemonDetails.appendChild(newChildElement);
+        parentElement.appendChild(newChildElement);
     }
 }
 
@@ -47,7 +47,7 @@ const generatePokemonPreview = (id, name, sprite, types) => {
 
     // pokemonDetails.appendChild(previewContainer);
 
-    updateParentElement(pokemonDetails,previewContainer,"pokemon-preview")
+    updateParentElement(pokemonDetails, previewContainer, "pokemon-preview")
 }
 
 const generatePokemonInfo = (moves) => {
@@ -62,7 +62,7 @@ const generatePokemonInfo = (moves) => {
 
     pokemonInfoContainer.appendChild(movesList);
 
-    updateParentElement(pokemonDetails,pokemonInfoContainer,"pokemon-info")
+    updateParentElement(pokemonDetails, pokemonInfoContainer, "pokemon-info")
 
 }
 
@@ -75,11 +75,12 @@ const generatePokemonCard = (id, name, sprite, types, moves) => {
     divElement.classList.add("pokemon-card");
     titleElement.innerText = name;
     imgElement.src = sprite;
+    imgElement.loading = "lazy";
 
     divElement.appendChild(titleElement);
     divElement.appendChild(imgElement);
     divElement.addEventListener('click', () => {
-        if(!!document.getElementById('pokemon-details-placeholder')){
+        if (!!document.getElementById('pokemon-details-placeholder')) {
             pokemonDetails.removeChild(document.getElementById('pokemon-details-placeholder'))
         }
         generatePokemonPreview(id, name, sprite, types)
@@ -89,6 +90,23 @@ const generatePokemonCard = (id, name, sprite, types, moves) => {
     return divElement;
 }
 
+const generateMovesTable = () => {
+    const tableElements = ['table','thead','tbody']; 
+    const [table, tableHead, tableBody] = tableElements.map(element => document.createElement(element));
+    const headerRow = document.createElement('tr');
+    const tableFieldElements = ["Move","Type","Category","Power","Accuracy","PP"].map(field => {
+        const fieldElement = document.createElement("th");
+        fieldElement.innerText = field;
+        return fieldElement;
+    })
+    tableHead.append(headerRow)
+    headerRow.append(...tableFieldElements)
+    table.append(tableHead, tableBody);
+    return table;
+}
+
+
+// fetchPokemonFromGen returns array of promises
 const fetchPokemonFromGen = async (id = 1) => {
     const response = await fetchPokeAPI("generation", id);
     const data = await response.json();
@@ -105,29 +123,70 @@ const fetchPokemonFromGen = async (id = 1) => {
 }
 
 const createPokemonGenList = async (gen = 1) => {
-
     const pokemon = await fetchPokemonFromGen(gen);
     const pokemonCardsContainer = document.createElement('div');
     pokemonCardsContainer.id = "cards-container";
+    const fragment = new DocumentFragment();
 
-    pokemon.map(pokemon => {
+    pokemon.forEach(pokemon => {
         const id = pokemon.id;
         const name = pokemon.name;
         const sprite = pokemon.sprites.other['official-artwork']['front_default'];
         const types = pokemon.types
         const moves = pokemon.moves
-        pokemonCardsContainer.appendChild(generatePokemonCard(id, name, sprite, types, moves));
+        fragment.appendChild(generatePokemonCard(id, name, sprite, types, moves))
     })
 
-    if (pokemonContainer.contains(document.getElementById("cards-container"))) {
-        pokemonContainer.replaceChild(pokemonCardsContainer, document.getElementById("cards-container"))
-    }
-    else {
-        pokemonContainer.appendChild(pokemonCardsContainer);
-    }
+    pokemonCardsContainer.appendChild(fragment);
+
+    updateParentElement(pokemonContainer, pokemonCardsContainer, "cards-container");
 
 }
 
 genBtns.forEach(btn => btn.addEventListener('click', async () => await createPokemonGenList(btn.dataset.id)))
 
 createPokemonGenList(1);
+
+
+const fetchPokemonMoves = async (pokemonID = 1) => {
+    try {
+        const response = await fetchPokeAPI("pokemon", pokemonID);
+        if(!response.ok){
+            console.error("Pokemon not found.")
+        }
+        const pokemon = await response.json();
+        fetchedMoves = pokemon.moves;
+
+        let moves = fetchedMoves.map(async move => {
+            const response = await fetch(move.move.url);
+            const additionalMoveInfo = await response.json();
+
+            return {
+                name: move.move.name,
+                lvl: createLvlLearnArray(move["version_group_details"]),
+                category: additionalMoveInfo["damage_class"]["name"],
+                type: additionalMoveInfo["type"]["name"],
+                power: additionalMoveInfo["power"],
+                accuracy: additionalMoveInfo["accuracy"],
+                pp: additionalMoveInfo["pp"],
+            }
+        })
+
+        return moves
+    } catch (error) {
+        console.error(error)
+    }
+
+}
+const createLvlLearnArray = (versionGroupDetails) => {
+    return versionGroupDetails.map(vgd => {
+        return {
+            learn_at: vgd["level_learned_at"],
+            learn_method: vgd["move_learn_method"]["name"],
+            game: vgd["version_group"]["name"]
+        }
+    })
+}
+
+pokemonDetails.appendChild(generateMovesTable())
+
