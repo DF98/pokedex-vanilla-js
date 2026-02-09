@@ -90,16 +90,38 @@ const generatePokemonCard = (id, name, sprite, types, moves) => {
     return divElement;
 }
 
-const generateMovesTable = () => {
-    const tableElements = ['table','thead','tbody']; 
+const generateMovesTable = async (moves, game = "scarlet-violet") => {
+    moves = await (moves);
+    moves = await Promise.all(moves)
+    
+    moves.forEach(move => move.lvl = move.lvl.filter(lvl => lvl.game === game))
+    moves = moves.filter(move => move.lvl.length !== 0)
+    moves = moves.sort((a, b) => a.lvl[0]["learn_at"] - b.lvl[0]["learn_at"])
+    console.log(moves)
+
+    const fragment = new DocumentFragment();
+    const tableElements = ['table', 'thead', 'tbody'];
     const [table, tableHead, tableBody] = tableElements.map(element => document.createElement(element));
     const headerRow = document.createElement('tr');
-    const tableFieldElements = ["Move","Type","Category","Power","Accuracy","PP"].map(field => {
+    const tableFieldElements = ["Level", "Move", "Type", "Category", "Power", "Accuracy", "PP"].map(field => {
         const fieldElement = document.createElement("th");
         fieldElement.innerText = field;
         return fieldElement;
     })
+
+    moves.forEach(move => {
+        const tableRow = document.createElement("tr");
+        for (const prop in move) {
+            const dataCell = document.createElement("td");
+            prop === "lvl" ? dataCell.innerText = move[`${prop}`][0]["learn_at"] : dataCell.innerText = move[`${prop}`]
+            tableRow.appendChild(dataCell)
+        }
+        fragment.append(tableRow);
+    })
+
+
     tableHead.append(headerRow)
+    tableBody.append(fragment);
     headerRow.append(...tableFieldElements)
     table.append(tableHead, tableBody);
     return table;
@@ -151,7 +173,7 @@ createPokemonGenList(1);
 const fetchPokemonMoves = async (pokemonID = 1) => {
     try {
         const response = await fetchPokeAPI("pokemon", pokemonID);
-        if(!response.ok){
+        if (!response.ok) {
             console.error("Pokemon not found.")
         }
         const pokemon = await response.json();
@@ -162,10 +184,10 @@ const fetchPokemonMoves = async (pokemonID = 1) => {
             const additionalMoveInfo = await response.json();
 
             return {
-                name: move.move.name,
                 lvl: createLvlLearnArray(move["version_group_details"]),
-                category: additionalMoveInfo["damage_class"]["name"],
+                name: move.move.name,
                 type: additionalMoveInfo["type"]["name"],
+                category: additionalMoveInfo["damage_class"]["name"],
                 power: additionalMoveInfo["power"],
                 accuracy: additionalMoveInfo["accuracy"],
                 pp: additionalMoveInfo["pp"],
@@ -188,5 +210,7 @@ const createLvlLearnArray = (versionGroupDetails) => {
     })
 }
 
-pokemonDetails.appendChild(generateMovesTable())
+
+generateMovesTable(fetchPokemonMoves(2)).then(table => pokemonDetails.appendChild(table))
+// pokemonDetails.appendChild()
 
