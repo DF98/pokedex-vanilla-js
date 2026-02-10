@@ -121,7 +121,7 @@ h2 {
 }
 
 #pokemon-info {
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .gen-btn {
