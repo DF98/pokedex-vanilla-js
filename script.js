@@ -20,9 +20,9 @@ const fetchPokeAPI = async (endpoint, id) => {
         -if child element is already present in the parent replace it with the new element. 
         -else just append the new child element to the parent element.
 */
-const updateParentElement = (parentElement, newChildElement, oldChildElementId) => {
-    if (parentElement.contains(document.getElementById(`${oldChildElementId}`))) {
-        parentElement.replaceChild(newChildElement, document.getElementById(`${oldChildElementId}`))
+const updateParentElement = (parentElement, newChildElement, oldChildElementSel) => {
+    if (parentElement.contains(document.querySelector(`${oldChildElementSel}`))) {
+        parentElement.replaceChild(newChildElement, document.querySelector(`${oldChildElementSel}`))
     } else {
         parentElement.appendChild(newChildElement);
     }
@@ -47,7 +47,7 @@ const generatePokemonPreview = (id, name, sprite, types) => {
 
     // pokemonDetails.appendChild(previewContainer);
 
-    updateParentElement(pokemonDetails, previewContainer, "pokemon-preview")
+    updateParentElement(pokemonDetails, previewContainer, "#pokemon-preview")
 }
 
 const generatePokemonInfo = (moves) => {
@@ -56,7 +56,7 @@ const generatePokemonInfo = (moves) => {
     const movesTable = generateMovesTable(moves)
     pokemonInfoContainer.append(movesTable);
 
-    updateParentElement(pokemonDetails, pokemonInfoContainer, "pokemon-info")
+    updateParentElement(pokemonDetails, pokemonInfoContainer, "#pokemon-info")
 
 }
 
@@ -159,7 +159,7 @@ const createPokemonGenList = async (gen = 1) => {
         })
 
         pokemonCardsContainer.appendChild(fragment) 
-        updateParentElement(pokemonContainer, pokemonCardsContainer, "cards-container");
+        updateParentElement(pokemonContainer, pokemonCardsContainer, "#cards-container");
     } catch (error) {
         console.error(error)
     }
@@ -225,5 +225,22 @@ document.getElementById("pokemon-container").addEventListener('click' , async ev
         moves =  await Promise.all(moves)
         generatePokemonInfo(moves)
     }
+})
+
+const pokemonSearch = document.getElementById("pokemon-search")
+
+pokemonSearch.addEventListener("input", ()=>{
+    const pokemonCards = document.querySelectorAll(".pokemon-card");
+    
+    if(pokemonSearch.value === ""){
+        pokemonCards.forEach(card => card.classList.remove("hidden"))
+    }
+    
+    pokemonCards.forEach(card => {
+        console.log(card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase()))
+        card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase())?
+        console.log("found ya"):
+        card.classList.add("hidden")
+    })
 })
 
