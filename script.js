@@ -32,16 +32,28 @@ const updateParentElement = (parentElement, newChildElement, oldChildElementSel)
 
 const generatePokemonPreview = (pokemon) => {
     let [id, name, sprite, types] = [pokemon.id,pokemon.name,pokemon.sprites.other["official-artwork"]["front_default"],pokemon.types]
-    console.log(`ID: ${id} Name: ${name} sprite: ${sprite} type: ${types}`)
     const previewContainer = document.createElement('div');
     const title = document.createElement('h2');
     const img = document.createElement('img');
-    const typesList = document.createElement('p');
+    const typesList = document.createElement('div');
+    typesList.id = "type-badge-container"
 
     previewContainer.id = "pokemon-preview";
     title.innerText = `#${id} ${name}`
     img.src = `${sprite}`
-    typesList.innerText = `Types: ${types.map(type => type.type.name).join(" ")}`
+
+    const typeBadges = types.map(type => {
+        const typeBadge = document.createElement("span");
+        const typeIcon = document.createElement("img");
+        typeBadge.classList.add("type-badge");
+        typeBadge.innerText = type.type.name;
+        typeIcon.src = `./images/icons/${type.type.name}.svg`
+        typeBadge.append(typeIcon);
+        return typeBadge
+    })
+    
+    typesList.append(...typeBadges)
+    // typesList.innerText = `Types: ${types.map(type => type.type.name).join(" ")}`
 
     previewContainer.append(title);
     previewContainer.append(img);
@@ -247,7 +259,7 @@ pokemonSearch.addEventListener("change", () => {
     })
 })
 
-const filterOptionsContainer = document.querySelector("#filter-options");
+const filterOptionsContainer = document.querySelector("#filter-toolbar");
 filterOptionsContainer.addEventListener("click", event => {
     const filterPanels = document.querySelectorAll(".filter-panel")
     const btnInnerText = event.target.innerText;
