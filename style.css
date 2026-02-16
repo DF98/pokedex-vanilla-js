@@ -157,7 +157,7 @@ h2 {
   align-items: center;
   gap:0.4em;
   background-color: lightgray;
-  padding: 0.3em;
+  padding: 0.3em 0.8em;
   min-width: 10ch;
   border-radius: 20px;
   text-align: center;

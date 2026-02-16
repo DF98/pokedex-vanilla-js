@@ -30,7 +30,9 @@ const updateParentElement = (parentElement, newChildElement, oldChildElementSel)
 
 // HTML GENERATION FUNCTIONS
 
-const generatePokemonPreview = (id, name, sprite, types) => {
+const generatePokemonPreview = (pokemon) => {
+    let [id, name, sprite, types] = [pokemon.id,pokemon.name,pokemon.sprites.other["official-artwork"]["front_default"],pokemon.types]
+    console.log(`ID: ${id} Name: ${name} sprite: ${sprite} type: ${types}`)
     const previewContainer = document.createElement('div');
     const title = document.createElement('h2');
     const img = document.createElement('img');
@@ -44,8 +46,6 @@ const generatePokemonPreview = (id, name, sprite, types) => {
     previewContainer.append(title);
     previewContainer.append(img);
     previewContainer.append(typesList);
-
-    // pokemonDetails.appendChild(previewContainer);
 
     updateParentElement(pokemonDetails, previewContainer, "#pokemon-preview")
 }
@@ -212,18 +212,18 @@ createPokemonGenList(1);
 
 
 document.getElementById("pokemon-container").addEventListener('click', async event => {
-
-
     if (document.contains(document.querySelector("#pokemon-details-placeholder"))) {
         pokemonDetails.removeChild(document.querySelector("#pokemon-details-placeholder"))
     }
     //added the wildcard * to selector because the image and h2 were covering the pokemon card element
     if (event.target.matches('.pokemon-card *')) {
         const pokemonID = event.target.parentElement.dataset.id;
-        // let table = await generateMovesTable(fetchPokemonMoves(pokemonID));
         moves = await fetchPokemonMoves(pokemonID)
         moves = await Promise.all(moves)
         generatePokemonInfo(moves)
+        const response = await fetchPokeAPI("pokemon",event.target.parentElement.dataset.id);
+        const pokemon = await response.json();
+        generatePokemonPreview(pokemon)
     }
 })
 
