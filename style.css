@@ -149,5 +149,28 @@ h2 {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
+}
+
+.type-btn {
+  display: flex;
+  align-items: center;
+  gap:0.4em;
+  background-color: lightgray;
+  padding: 0.3em;
+  min-width: 10ch;
+  border-radius: 20px;
+  text-align: center;
+}
+.type-btn img{
+  width: 30px;
+}
+.type-btn:hover{
+  background-color: gray;
+}
+#type-btn-container{
+  display: flex;
+  gap: 0.3em;
+  flex-wrap: wrap;
+  flex: 1 1 0;
 }
