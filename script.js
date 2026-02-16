@@ -84,7 +84,7 @@ const generatePokemonCard = (id, name, sprite) => {
 
 }
 
-const generateMovesTable =  (moves, game = "scarlet-violet") => {
+const generateMovesTable = (moves, game = "scarlet-violet") => {
     try {
         moves.forEach(move => move.lvl = move.lvl.filter(lvl => lvl.game === game))
         moves = moves.filter(move => move.lvl.length !== 0)
@@ -151,14 +151,14 @@ const createPokemonGenList = async (gen = 1) => {
         pokemonCardsContainer.id = "cards-container";
         const fragment = new DocumentFragment();
 
-        const pokemonCards = pokemonList.map( pokemon => {
+        const pokemonCards = pokemonList.map(pokemon => {
             const id = pokemon.id;
             const name = pokemon.name;
             const sprite = pokemon.sprites.other['official-artwork']['front_default'];
             fragment.append(generatePokemonCard(id, name, sprite))
         })
 
-        pokemonCardsContainer.appendChild(fragment) 
+        pokemonCardsContainer.appendChild(fragment)
         updateParentElement(pokemonContainer, pokemonCardsContainer, "#cards-container");
     } catch (error) {
         console.error(error)
@@ -211,36 +211,39 @@ createPokemonGenList(1);
 // pokemonDetails.appendChild()
 
 
-document.getElementById("pokemon-container").addEventListener('click' , async event => {
-    
+document.getElementById("pokemon-container").addEventListener('click', async event => {
+
 
     if (document.contains(document.querySelector("#pokemon-details-placeholder"))) {
         pokemonDetails.removeChild(document.querySelector("#pokemon-details-placeholder"))
-    } 
+    }
 
-    if(event.target.matches('.pokemon-card *')){
+    if (event.target.matches('.pokemon-card *')) {
         const pokemonID = event.target.parentElement.dataset.id;
         // let table = await generateMovesTable(fetchPokemonMoves(pokemonID));
         moves = await fetchPokemonMoves(pokemonID)
-        moves =  await Promise.all(moves)
+        moves = await Promise.all(moves)
         generatePokemonInfo(moves)
     }
 })
 
 const pokemonSearch = document.getElementById("pokemon-search")
 
-pokemonSearch.addEventListener("input", ()=>{
+pokemonSearch.addEventListener("change", () => {
     const pokemonCards = document.querySelectorAll(".pokemon-card");
-    
-    if(pokemonSearch.value === ""){
-        pokemonCards.forEach(card => card.classList.remove("hidden"))
-    }
-    
+    console.log(pokemonSearch.value)
+
+    // if(pokemonSearch.value === ""){
+    //     pokemonCards.forEach(card => card.classList.remove("hidden"))
+    // }
+
     pokemonCards.forEach(card => {
-        console.log(card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase()))
-        card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase())?
-        console.log("found ya"):
-        card.classList.add("hidden")
+        if (!card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase())) {
+            card.classList.add("hidden")
+        }
+        else{
+            card.classList.remove("hidden")
+        }
     })
 })
 
