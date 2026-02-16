@@ -22,20 +22,44 @@
 
         <div id="filter-toolbar">
             <div id="filter-options">
-                <button>Search</button>
-                <button>Generation</button>
-                <button>Type</button>
+                <button class="filter-btn">Search</button>
+                <button class="filter-btn">Generation</button>
+                <button class="filter-btn">Type</button>
             </div>
-            <button data-id="1" class="gen-btn">Gen I</button>
-            <button data-id="2" class="gen-btn">Gen II</button>
-            <button data-id="3" class="gen-btn">Gen III</button>
-            <button data-id="4" class="gen-btn">Gen IV</button>
-            <button data-id="5" class="gen-btn">Gen V</button>
-            <button data-id="6" class="gen-btn">Gen VI</button>
-            <button data-id="7" class="gen-btn">Gen VII</button>
-            <button data-id="8" class="gen-btn">Gen VIII</button>
-            <button data-id="9" class="gen-btn">Gen IX</button>
-            <input type="text" name="pokemon-search" id="pokemon-search">
+            <div id="gen-btn-container" class="filter-panel hidden">
+                <button data-id="1" class="gen-btn">Gen I</button>
+                <button data-id="2" class="gen-btn">Gen II</button>
+                <button data-id="3" class="gen-btn">Gen III</button>
+                <button data-id="4" class="gen-btn">Gen IV</button>
+                <button data-id="5" class="gen-btn">Gen V</button>
+                <button data-id="6" class="gen-btn">Gen VI</button>
+                <button data-id="7" class="gen-btn">Gen VII</button>
+                <button data-id="8" class="gen-btn">Gen VIII</button>
+                <button data-id="9" class="gen-btn">Gen IX</button>
+            </div>
+            <div id="pokemon-search-container" class="filter-panel">
+                <input type="text" name="pokemon-search" id="pokemon-search">
+            </div>
+            <div id="type-btn-container" class="filter-panel hidden">
+                <button class="type-btn">Normal</button>
+                <button class="type-btn">Fire</button>
+                <button class="type-btn">Water</button>
+                <button class="type-btn">Electric</button>
+                <button class="type-btn">Grass</button>
+                <button class="type-btn">Ice</button>
+                <button class="type-btn">Fighting</button>
+                <button class="type-btn">Poison</button>
+                <button class="type-btn">Ground</button>
+                <button class="type-btn">Flying</button>
+                <button class="type-btn">Psychic</button>
+                <button class="type-btn">Bug</button>
+                <button class="type-btn">Rock</button>
+                <button class="type-btn">Ghost</button>
+                <button class="type-btn">Dragon</button>
+                <button class="type-btn">Dark</button>
+                <button class="type-btn">Steel</button>
+                <button class="type-btn">Fairy</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

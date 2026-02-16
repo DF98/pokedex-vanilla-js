@@ -217,7 +217,7 @@ document.getElementById("pokemon-container").addEventListener('click', async eve
     if (document.contains(document.querySelector("#pokemon-details-placeholder"))) {
         pokemonDetails.removeChild(document.querySelector("#pokemon-details-placeholder"))
     }
-
+    //added the wildcard * to selector because the image and h2 were covering the pokemon card element
     if (event.target.matches('.pokemon-card *')) {
         const pokemonID = event.target.parentElement.dataset.id;
         // let table = await generateMovesTable(fetchPokemonMoves(pokemonID));
@@ -245,5 +245,28 @@ pokemonSearch.addEventListener("change", () => {
             card.classList.remove("hidden")
         }
     })
+})
+
+const filterOptionsContainer = document.querySelector("#filter-options");
+filterOptionsContainer.addEventListener("click", event => {
+    const filterPanels = document.querySelectorAll(".filter-panel")
+    const btnInnerText = event.target.innerText;
+    const [genPanelIndex, typePanelIndex, searchPanelIndex] = ["gen-btn-container","type-btn-container","pokemon-search-container"].map(id => [...filterPanels].findIndex(panel => panel.id === id))
+
+    if(btnInnerText === "Search"){
+        [...filterPanels][searchPanelIndex].classList.remove("hidden");
+        [...filterPanels][genPanelIndex].classList.add("hidden");
+        [...filterPanels][typePanelIndex].classList.add("hidden");
+    }
+    else if(btnInnerText === "Generation"){
+        [...filterPanels][searchPanelIndex].classList.add("hidden");
+        [...filterPanels][genPanelIndex].classList.remove("hidden");
+        [...filterPanels][typePanelIndex].classList.add("hidden");
+    }
+    else if(btnInnerText === "Type"){
+        [...filterPanels][searchPanelIndex].classList.add("hidden");
+        [...filterPanels][genPanelIndex].classList.add("hidden");
+        [...filterPanels][typePanelIndex].classList.remove("hidden");
+    }
 })
 
