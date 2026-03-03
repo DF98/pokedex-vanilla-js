@@ -80,23 +80,18 @@ h2 {
   grid-template-columns: 20% 1fr;
   position: relative;
   height: 50dvh;
-  overflow-y: scroll;
 }
 
 #panels-container{
   grid-area: panels;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100%;
-  border: 5px solid black;
   background-color: aquamarine;
-  padding: 0.5em 0.8em;
-  max-height: 30dvh
+  overflow-y: scroll;
 }
 .filter-panel{
-  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  padding: 1em;
 }
 #filter-toolbar {
   grid-area: toolbar;
@@ -112,11 +107,15 @@ h2 {
 #cards-container {
   grid-area: cards;
   display: flex;
+  position: sticky;
+  bottom: 0;
   flex-wrap: wrap;
   gap: 1em;
   justify-content: center;
   background-color: red;
   padding: 2em 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 .pokemon-card {
   display: flex;
@@ -124,6 +123,7 @@ h2 {
   align-items: center;
   background-color: grey;
   width: 20%;
+  max-height: 11em;
   border-radius: 1rem;
   transition: .3s ease;
 }
@@ -179,13 +179,7 @@ h2 {
 .type-btn:hover{
   background-color: gray;
 }
-#type-btn-container{
-  display: flex;
-  gap: 0.3em;
-  flex-wrap: wrap;
-  flex: 1 1 0;
-}
-.type-badge{
+.type-badge {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;

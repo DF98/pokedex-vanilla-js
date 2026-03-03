@@ -133,8 +133,6 @@ const generateMovesTable = (moves, game = "scarlet-violet") => {
         console.error(error)
     }
 }
-
-
 // fetchPokemonFromGen returns array of promises
 const fetchPokemonFromGen = async (id = 1) => {
     try {
@@ -245,10 +243,6 @@ pokemonSearch.addEventListener("change", () => {
     const pokemonCards = document.querySelectorAll(".pokemon-card");
     console.log(pokemonSearch.value)
 
-    // if(pokemonSearch.value === ""){
-    //     pokemonCards.forEach(card => card.classList.remove("hidden"))
-    // }
-
     pokemonCards.forEach(card => {
         if (!card.innerText.toLowerCase().includes(pokemonSearch.value.toLowerCase())) {
             card.classList.add("hidden")
@@ -281,4 +275,8 @@ filterOptionsContainer.addEventListener("click", event => {
         [...filterPanels][typePanelIndex].classList.remove("hidden");
     }
 })
+
+const typeBtns = document.querySelectorAll(".type-btn")
+const typeBtnContaier = document.querySelector("#type-btn-container")
+typeBtnContaier.addEventListener("click", e => console.log(e.target.innerText))
 
