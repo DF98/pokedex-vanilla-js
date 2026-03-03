@@ -6,11 +6,11 @@
 Project is for educational purposes made using HTML, CSS and JavaScript. It serves as a way to reinforce concepts covered in the FreeCodeCamp curriculum. 
 
 ## Featured Concepts Present in this Project
-###CSS
+### CSS
 - Creation of responsive layouts using Flexbox and Grid
 - Utilisation of the clamp function for responsive font size
 - CSS transitions not only used to make the user interface more aesthetically pleasing, but also improve user feedback while hovering over interactive buttons.
-###JavaScript
+### JavaScript
 - Functions
 - Promises
 - Async/Await
